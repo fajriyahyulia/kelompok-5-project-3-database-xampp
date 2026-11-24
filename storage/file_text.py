@@ -5,10 +5,8 @@
 #Angkatan : 2025
 import os
 
-
 class PenyimpananError(Exception):
     """Gagal membaca atau menulis file data."""
-
 
 class FileTeks:
     """Satu-satunya tempat operasi baca/tulis text file.

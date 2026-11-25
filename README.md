@@ -1,6 +1,6 @@
 # Sistem Pengelolaan Peminjaman Peralatan Laboratorium (Text File + MariaDB)
 
-Proyek 2 Praktikum Pemrograman Dasar. Lanjutan Proyek 1: logika peminjaman yang sama, tetapi seluruh data disimpan permanen di text file (.txt) sehingga tidak hilang saat program ditutup. Selama program berjalan, data dikelola dalam List dan Dictionary.
+Proyek 3 Praktikum Pemrograman Dasar. Lanjutan Proyek 1: logika peminjaman yang sama, tetapi seluruh data disimpan permanen di text file (.txt) sehingga tidak hilang saat program ditutup. Selama program berjalan, data dikelola dalam List dan Dictionary.
 
 ## Versi Database (MariaDB)
 
@@ -30,8 +30,6 @@ Pengujian: `python -m unittest discover -s tests` (40 tes text file dan 19 tes d
 | 2 | Sulthan Hafizh Putra Agung | K3525013 |
 | 3 | Zahra Faizza Kuncoroningrum | K3525017 |
 | 4 | Muzni Mubarok Salim | K3525036 |
-
-Pembagian kontribusi ada di [docs/Pembagian_Tugas.md](docs/Pembagian_Tugas.md).
 
 ## Deskripsi Sistem
 
@@ -82,7 +80,7 @@ Alur baca/tulis: manager tidak pernah menyentuh file. Mereka memanggil `Reposito
 
 ## Format File
 
-Satu baris satu data, kolom dipisahkan `|`. Baris kosong dan baris berawalan `#` diabaikan. Rincian lengkap ada di [docs/Format_File.md](docs/Format_File.md).
+Satu baris satu data, kolom dipisahkan `|`. Baris kosong dan baris berawalan `#` diabaikan.
 
 ```text
 mahasiswa.txt         NIM|nama|no_hp|status_aktif
@@ -110,8 +108,6 @@ Untuk memulai dari data kosong, hapus isi folder `data/`. File akan dibuat ulang
 ```bash
 python -m unittest discover -s tests -v
 ```
-
-Hasil dan pemetaan ke skenario wajib ada di [docs/Hasil_Pengujian.md](docs/Hasil_Pengujian.md).
 
 ## Perilaku Penting
 

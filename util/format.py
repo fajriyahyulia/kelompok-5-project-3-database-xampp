@@ -1,46 +1,58 @@
 #dikerjakan oleh:
 # Nama : Fajriyah Yulia Az Zahra
 # NIM : K3525005
-import os
 
-from core.sistem import Sistem
-from storage.file_teks import PenyimpananError
-from ui.Menu import Menu
-
-FOLDER_PROYEK = os.path.dirname(os.path.abspath(__file__))
+HEADER_MAHASISWA = ("NIM", "Nama", "No. HP", "Status peminjaman")
+HEADER_ALAT = ("Kode", "Nama", "Kategori", "Kondisi", "Status")
+HEADER_DIPINJAM = ("Kode", "Nama", "Kategori", "Peminjam", "Transaksi", "Batas kembali")
 
 
-def siapkan_database():
-    """Mengembalikan objek Database bila MariaDB bisa dipakai, atau None untuk mode text file.
+def buat_tabel(header, baris):
+    lebar = [len(str(h)) for h in header]
+    for b in baris:
+        for i, sel in enumerate(b):
+            lebar[i] = max(lebar[i], len(str(sel)))
+    pemisah = "+" + "+".join("-" * (w + 2) for w in lebar) + "+"
 
-    Mode text file dipakai bila PEMINJAMAN_MODE=txt, PyMySQL belum terpasang, atau MariaDB
-    (XAMPP) belum dinyalakan. Alasannya selalu ditampilkan, tidak diam-diam.
-    """
-    if os.environ.get("PEMINJAMAN_MODE", "db").lower() == "txt":
-        return None
-    try:
-        from storage.database import Database
-    except ImportError:
-        print("[!] PyMySQL belum terpasang (pip install pymysql). Memakai mode text file.")
-        return None
-    database = Database()
-    try:
-        database.pastikan_skema()
-    except PenyimpananError as e:
-        print(f"[!] {e}\n    Nyalakan MySQL di XAMPP untuk memakai database. Memakai mode text file.")
-        return None
-    return database
+    def rapikan(b):
+        return "| " + " | ".join(str(s).ljust(w) for s, w in zip(b, lebar)) + " |"
+
+    keluar = [pemisah, rapikan(header), pemisah]
+    keluar.extend(rapikan(b) for b in baris)
+    keluar.extend([pemisah, f"Total: {len(baris)} data"])
+    return "\n".join(keluar)
 
 
-if __name__ == "__main__":
-    try:
-        sistem = Sistem(
-            folder_data=os.path.join(FOLDER_PROYEK, "data"),
-            folder_backup=os.path.join(FOLDER_PROYEK, "backup"),
-            folder_laporan=os.path.join(FOLDER_PROYEK, "laporan"),
-            database=siapkan_database(),
-        )
-    except PenyimpananError as e:
-        print(f"[!] Data tidak dapat dibaca, program dihentikan: {e}")
-    else:
-        Menu(sistem).jalankan()
+def baris_mahasiswa(daftar, transaksi_list):
+    return [(m.nim, m.nama, m.no_hp, m.status_aktif(transaksi_list)) for m in daftar]
+
+
+def baris_alat(daftar):
+    return [(a.kode, a.nama, a.kategori, a.kondisi.teks, a.status_teks().capitalize())
+            for a in daftar]
+
+
+def baris_dipinjam(rincian):
+    return [(a.kode, a.nama, a.kategori, f"{t.mahasiswa.nim} - {t.mahasiswa.nama}",
+             t.id_transaksi, str(t.batas_kembali)) for a, t in rincian]
+
+
+def teks_transaksi(trx, acuan=None):
+    baris = [
+        f"ID Transaksi   : {trx.id_transaksi}",
+        f"Peminjam       : {trx.mahasiswa.nim} - {trx.mahasiswa.nama}",
+        f"Tanggal pinjam : {trx.tanggal_pinjam}",
+        f"Batas kembali  : {trx.batas_kembali}",
+        f"Status         : {trx.status.value}",
+        "Alat           :",
+    ]
+    for i, item in enumerate(trx.daftar_item, start=1):
+        if item.sudah_kembali:
+            ket = f"Kembali {item.tanggal_kembali}, kondisi {item.kondisi_kembali.teks}"
+        else:
+            ket = "Masih dipinjam"
+        telat = item.hari_terlambat(trx.batas_kembali, acuan)
+        if telat:
+            ket += f", terlambat {telat} hari"
+        baris.append(f"  {i}. {item.alat.kode} - {item.alat.nama}  [{ket}]")
+    return "\n".join(baris)

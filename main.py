@@ -11,11 +11,6 @@ FOLDER_PROYEK = os.path.dirname(os.path.abspath(__file__))
 
 
 def siapkan_database():
-    """Mengembalikan objek Database bila MariaDB bisa dipakai, atau None untuk mode text file.
-
-    Mode text file dipakai bila PEMINJAMAN_MODE=txt, PyMySQL belum terpasang, atau MariaDB
-    (XAMPP) belum dinyalakan. Alasannya selalu ditampilkan, tidak diam-diam.
-    """
     if os.environ.get("PEMINJAMAN_MODE", "db").lower() == "txt":
         return None
     try:
